@@ -12,11 +12,13 @@ param4=[81,487,242,4,122]           # f1=x^81-232  and f2=x^81-254   , alpha=232
 param5=[243,1459,729,9, 1297]       # f1=x^243-339 and f2=x^243-1119 , alpha=339  , beta=1119
 param6=[729,17497,12013,4, 13123]   # f=x^729-4719 and f2=x^729-12777, alpha=4719 , beta=12777
 
-param1459=[81,1459,547,729, 1457]  # f1=x^81-339 and f2=x^81-1119, alpha=339 , beta=1119
-param2917=[81,2917,764,2890,108]   # f1=x^81-247 and f2=x^81-2669, alpha=247 , beta=2669
+param811459=[81,1459,547,729, 1457]  # f1=x^81-339 and f2=x^81-1119, alpha=339 , beta=1119
+param812917=[81,2917,764,2890,108]   # f1=x^81-247 and f2=x^81-2669, alpha=247 , beta=2669
+
+param2432917=[243, 2917, 1040, 2914, 972] #f1=x^243-247 and f2=x^243-2669 , alpha=247 , beta=2669 
 
 
-param=param2917
+param=param812917
 
 
 ############################ Parameters ##########################
@@ -93,7 +95,6 @@ def NTT(a,r):
 
 def INTT(a,s):
     l=log(n,3)
-    ninv=inverse_mod(n,p)
     winv=inverse_mod(w,p)
     mu=w^(n/3) % p
     gamma_inverse=[s*winv^i%p for i in range(n/3)]
@@ -103,8 +104,6 @@ def INTT(a,s):
             wkinv=(gamma_inverse[j]^(n/m))%p  
             for k in range(0,n/m):
                 [a[k*m+j], a[k*m+j+m/3], a[k*m+j+2*m/3]]=butterfly(a[k*m+j],a[k*m+j+m/3],a[k*m+j+2*m/3],wkinv,mu,1)
-    a = ninv*a
-    a = [ai % p for ai in a]
     A = scramble(a,n)
     return A
        
@@ -131,11 +130,12 @@ def icrt(c_alpha,c_beta,alpha,beta):
 
 # -------------------------------------------------------------------
 
-# for Z_1459
+##uncomment the parameters according to the ring.
+## for Z_1459
 #alpha=339 
 #beta=1119
 
-# for Z_2917
+## for Z_2917
 alpha=247
 beta=2669
 
