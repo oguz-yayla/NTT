@@ -96,7 +96,7 @@ def NTT(a,ring):
         for j in range(0,m/3):   
             wk=(gamma[ring][j]**(n/m))%p
             for k in range(0,n/m):  
-                [A[k*m+j], A[k*m+j+m/3],A[k*m+j+2*m/3]]=butterfly(A[k*m+j],A[k*m+j+m/3],A[k*m+j+2*m/3],wk,mu,0)
+                [A[k*m+j], A[k*m+j+m/3],A[k*m+j+2*m/3]]=butterfly(A[k*m+j],A[k*m+j+m/3],A[k*m+j+2*m/3],wk,0)
     return A
 
 def INTT(a,ring):
@@ -105,7 +105,7 @@ def INTT(a,ring):
         for j in range(0,m/3):
             wkinv=(gamma_inverse[ring][j]^(n/m))%p  
             for k in range(0,n/m):
-                [a[k*m+j], a[k*m+j+m/3], a[k*m+j+2*m/3]]=butterfly(a[k*m+j],a[k*m+j+m/3],a[k*m+j+2*m/3],wkinv,mu,1)
+                [a[k*m+j], a[k*m+j+m/3], a[k*m+j+2*m/3]]=butterfly(a[k*m+j],a[k*m+j+m/3],a[k*m+j+2*m/3],wkinv,1)
     A = scramble(a,n)
     return A
        
