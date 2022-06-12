@@ -28,6 +28,18 @@ w=param[2] # nth root of unity
 r=param[3] # nth root of alpha
 s=param[4] # s=r^-1, also nth root of beta
 
+winv=inverse_mod(w,p)
+
+mu=w**(n/3) % p
+mu2=mu**2 % p 
+
+l=log(n,3)
+
+gamma=[[r*w**i%p for i in range(n/3)],[s*w**i%p for i in range(n/3)]]
+gamma_inverse=[[r*winv^i%p for i in range(n/3)],[s*winv^i%p for i in range(n/3)]]
+
+inv3=inverse_mod(3,p)
+
 # r and w are precomputed
 
 
@@ -58,10 +70,9 @@ def basemul2(a,b,r):
     c[2]= (a[0]*b[2]+a[1]*b[1]+a[2]*b[0])%p
     return c    
 
-def butterfly(a,b,c,w,mu,kind):
+def butterfly(a,b,c,w,kind):
     result=[0,0,0] 
     w2=w**2 % p
-    mu2=mu**2 % p 
     if kind == 0:
         wb =mmult(b,w)
         w2c=mmult(c,w2)
@@ -73,34 +84,26 @@ def butterfly(a,b,c,w,mu,kind):
         result[1]=madd(a, madd(muwb,mu2w2c))   #exp: a+mu w^k b+mu^2 w^2k c
         result[2]=madd(a, madd(mu2wb,muw2c))   #exp: a+mu^2 w^k b+mu w^2k c
     else:
-        inv3=inverse_mod(3,p)
         result[0]= mmult(inv3, madd(a,madd(b,c)))                               #exp: 1/3 * (a+b+c)
         result[1]= mmult(mmult(inv3,w),madd(a,madd(mmult(mu2,b),mmult(mu,c))))  #exp: 1/3 * 1/w^k * (a+mu2*b+mu*c)
         result[2]= mmult(mmult(inv3,w2),madd(a,madd(mmult(mu,b),mmult(mu2,c)))) #exp: 1/3 * 1/w^(2k) * (a+mu*b+mu2*c)
     return result
         
-def NTT(a,r):
-    l=log(n,3)
-    mu=w**(n/3) % p
-    gamma=[r*w**i%p for i in range(n/3)]
+def NTT(a,ring):
     A=scramble(a,n)
     for level in range(1,l+1):   
         m=3**level
         for j in range(0,m/3):   
-            wk=(gamma[j]**(n/m))%p
+            wk=(gamma[ring][j]**(n/m))%p
             for k in range(0,n/m):  
                 [A[k*m+j], A[k*m+j+m/3],A[k*m+j+2*m/3]]=butterfly(A[k*m+j],A[k*m+j+m/3],A[k*m+j+2*m/3],wk,mu,0)
     return A
 
-def INTT(a,s):
-    l=log(n,3)
-    winv=inverse_mod(w,p)
-    mu=w^(n/3) % p
-    gamma_inverse=[s*winv^i%p for i in range(n/3)]
+def INTT(a,ring):
     for level in range(l,0,-1):
         m=3**level
         for j in range(0,m/3):
-            wkinv=(gamma_inverse[j]^(n/m))%p  
+            wkinv=(gamma_inverse[ring][j]^(n/m))%p  
             for k in range(0,n/m):
                 [a[k*m+j], a[k*m+j+m/3], a[k*m+j+2*m/3]]=butterfly(a[k*m+j],a[k*m+j+m/3],a[k*m+j+2*m/3],wkinv,mu,1)
     A = scramble(a,n)
@@ -143,8 +146,8 @@ for i in range(10000):
     a=[random.randrange(0, p) for i in range(162)]
     b=[random.randrange(0, p) for i in range(162)]
     t1=time.time()
-    c_alpha=INTT(pmult(NTT(crt(a,alpha),r),NTT(crt(b,alpha),r)),s)
-    c_beta =INTT(pmult(NTT(crt(a,beta),s),NTT(crt(b,beta),s)),r)
+    c_alpha=INTT(pmult(NTT(crt(a,alpha),0),NTT(crt(b,alpha),0)),1)
+    c_beta =INTT(pmult(NTT(crt(a,beta),1),NTT(crt(b,beta),1)),0)
     icrt(c_alpha,c_beta,alpha,beta);
     t2=time.time()
     runtime[i]=t2-t1
