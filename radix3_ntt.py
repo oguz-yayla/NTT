@@ -40,6 +40,19 @@ gamma_inverse=[[r*winv^i%p for i in range(n/3)],[s*winv^i%p for i in range(n/3)]
 
 inv3=inverse_mod(3,p)
 
+wk=[0,0] 
+wk[0]=[0]*l
+wk[1]=[0]*l
+
+for level in range(1,l+1):   
+    m=3**level
+    wk[0][level]=[0]*(m/3)
+    wk[1][level]=[0]*(m/3)
+
+    for j in range(0,m/3): 
+        wk[0][level][j]=(gamma[0][j]**(n/m))%p
+        wk[1][level][j]=(gamma[1][j]**(n/m))%p
+
 # r and w are precomputed
 
 
